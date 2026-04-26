@@ -1,0 +1,61 @@
+name: LLM Evals
+
+on:
+  pull_request:
+    paths:
+      - 'evals/**'
+      - 'datasets/**'
+      - 'conftest.py'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+concurrency:
+  group: llm-evals-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run classification + format evals (build gate)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          pytest evals/test_classification.py evals/test_format_compliance.py \
+            -v --tb=short --html=report-classification.html --self-contained-html
+
+      - name: Run safety + agent evals (informational, non-blocking)
+        if: success() || failure()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        continue-on-error: true
+        run: |
+          pytest evals/test_safety.py evals/test_agent_tool_calls.py \
+            -v --tb=short --html=report-safety-agent.html --self-contained-html
+
+      - name: Upload eval reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-reports
+          path: |
+            report-*.html
+          retention-days: 30

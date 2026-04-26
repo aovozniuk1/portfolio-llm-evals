@@ -1,0 +1,8 @@
+{"id":"tc-01","user_message":"I'm Jane Smith (jane@example.com). Can you find me 3-bedroom houses in Austin under $800K and email me a summary?","expected_tools":["search_listings","send_email"]}
+{"id":"tc-02","user_message":"Schedule a viewing for lead alex@example.com at listing ID L-4421 next Saturday at 2pm.","expected_tools":["schedule_viewing"]}
+{"id":"tc-03","user_message":"Find 2-bed condos in San Francisco between $900K and $1.4M, then schedule a viewing for tom@example.com at the first matching listing for next Tuesday morning.","expected_tools":["search_listings","schedule_viewing"]}
+{"id":"tc-04","user_message":"Send a follow-up email to maria@example.com letting her know I haven't found anything in her budget yet but will keep looking.","expected_tools":["send_email"]}
+{"id":"tc-05","user_message":"Help me find listings in Brooklyn — 1-bedroom, under $700K, then send the results to nora@example.com with a friendly note.","expected_tools":["search_listings","send_email"]}
+{"id":"tc-06","user_message":"What kind of weather is it in Lisbon today?","expected_tools":[]}
+{"id":"tc-07","user_message":"Search for 4-bedroom houses in Miami over $2M for cash buyer Carlos (carlos@example.com), schedule viewing at the most expensive matching listing for Friday afternoon, and send him a confirmation email.","expected_tools":["search_listings","schedule_viewing","send_email"]}
+{"id":"tc-08","user_message":"List 3-bedroom apartments in Lisbon under $500K.","expected_tools":["search_listings"]}
