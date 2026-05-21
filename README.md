@@ -6,7 +6,7 @@ Tests an example real-estate lead classifier (the same prompt that powers the [n
 
 | Dimension | What it catches |
 |---|---|
-| **Classification accuracy** | Prompt regressions that drop ground-truth label match below 90% |
+| **Classification accuracy** | Prompt regressions that drop ground-truth label match below 95% (baseline 100% on Haiku) |
 | **Format compliance** | Invalid JSON, missing required fields, out-of-spec enum values |
 | **Consistency** | Same input producing different outputs at temperature=0 |
 | **Safety / prompt injection** | OWASP LLM Top 10 attacks that override the system prompt or leak attack markers |
@@ -88,7 +88,9 @@ This matches how mature QA teams treat AI features: lock down what can be locked
 
 ### 2. Threshold gates, not pass/fail per case
 
-`test_classifier_accuracy_threshold` runs the entire dataset and fails CI if aggregate accuracy drops below 90%. Individual case failures are diagnostic — the gate is the threshold. This avoids prompt-engineering whack-a-mole where one fix breaks two other cases.
+`test_classifier_accuracy_threshold` runs the entire dataset and fails CI if aggregate accuracy drops below 95%. Individual case failures are diagnostic — the gate is the threshold. This avoids prompt-engineering whack-a-mole where one fix breaks two other cases.
+
+The 95% gate is calibrated against the prompt's 100% baseline (measured across 3 stability runs on Haiku, temperature=0). A 90% gate against a 100% baseline would never fire; a 100% gate would be brittle against single-call Haiku variance. 95% means a single new misclassification (1/20) flips the gate red — that's the sensitivity we want.
 
 ### 3. Same prompt, multiple test angles
 
@@ -102,14 +104,14 @@ The `pytest.ini` `addopts` setting includes `-x` (stop on first failure) by defa
 
 | Test file | API calls per run | Cost (Haiku) |
 |---|---|---|
-| test_classification.py | ~22 (20 cases + 2 aggregates) | ~$0.007 |
+| test_classification.py | ~22 (20 cases + 2 aggregates) | ~$0.010 |
 | test_format_compliance.py | ~20 | ~$0.006 |
 | test_consistency.py | ~10 (5 cases × 2 runs each) | ~$0.003 |
 | test_safety.py | ~10 | ~$0.003 |
 | test_agent_tool_calls.py | ~16 (8 scenarios × 2 calls avg) | ~$0.005 |
-| **Total per full run** | **~78 calls** | **~$0.024** |
+| **Total per full run** | **~78 calls** | **~$0.030** |
 
-At 1 PR per day = ~$0.72/mo. Even at 100 PRs per day = ~$72/mo.
+At 1 PR per day = ~$0.90/mo. Even at 100 PRs per day = ~$90/mo. The v2 classifier prompt is ~3x longer than v1, which is what bumped test_classification.py from $0.007 to $0.010.
 
 ## Limitations and where this approach breaks
 

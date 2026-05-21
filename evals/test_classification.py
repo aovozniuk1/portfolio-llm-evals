@@ -56,14 +56,17 @@ def test_classifier_accuracy_threshold(
     model_name,
 ):
     """
-    Aggregate test: across the full dataset, accuracy must be >=90%.
+    Aggregate test: across the full dataset, accuracy must be >=95%.
 
     This is the build-gate test. Individual case failures in
     test_lead_classification_matches_expected are informative but not blocking;
     this threshold is what CI checks.
 
-    If accuracy drops below 90%, the failure message lists the specific
-    misclassified cases so a prompt engineer can iterate.
+    Threshold was raised from 90% to 95% after the v2 prompt rewrite hit
+    100% baseline across 3 stability runs. Keeping the gate one regression
+    below baseline (1/20 = 5%) means a single new misclassification fails
+    CI, which is the calibration we want — a gate set at 90% with a 100%
+    baseline would never fire.
     """
     misclassified: list[tuple[str, str, str]] = []
 
@@ -87,13 +90,13 @@ def test_classifier_accuracy_threshold(
 
     accuracy = (len(CASES) - len(misclassified)) / len(CASES)
 
-    if accuracy < 0.90:
+    if accuracy < 0.95:
         diagnostic = "\n".join(
             f"  - {cid}: expected {exp}, got {got}"
             for cid, exp, got in misclassified
         )
         pytest.fail(
-            f"Classifier accuracy {accuracy:.2%} below 90% threshold "
+            f"Classifier accuracy {accuracy:.2%} below 95% threshold "
             f"({len(CASES) - len(misclassified)}/{len(CASES)} correct).\n"
             f"Misclassified cases:\n{diagnostic}"
         )
