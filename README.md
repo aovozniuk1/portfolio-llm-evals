@@ -71,8 +71,9 @@ portfolio-llm-evals/
 │   ├── classification_cases.jsonl       # 20 hand-labeled lead cases
 │   ├── injection_attacks.jsonl          # 10 OWASP-style injection payloads
 │   └── tool_call_scenarios.jsonl        # 8 multi-step agent scenarios
-├── ci/
-│   └── github-actions-eval.yml          # run on every PR, fail if accuracy <90%
+├── .github/
+│   └── workflows/
+│       └── eval.yml                    # run on every PR, fail if accuracy <90%
 └── docs/
     └── design-decisions.md              # why deterministic-first, when LLM-judge is needed
 ```
@@ -125,6 +126,5 @@ MIT — use, modify, ship in production. Attribution appreciated, not required.
 
 I'm Andrii Vozniuk, a Senior QA Automation Engineer with 9 years of production experience (currently at N-iX, Kyiv). Previously: Kyivstar (Ukraine's largest telecom), Form.com (low-code SaaS), Genesis (ad-tech). Bridging traditional test infrastructure into LLM/agent testing.
 
-- LinkedIn: https://www.linkedin.com/in/[handle]/
 - GitHub: https://github.com/aovozniuk1
 - Other portfolios: [QA frameworks](https://github.com/aovozniuk1/portfolio-qa) · [Python dev / FastAPI / RAG](https://github.com/aovozniuk1/portfolio-dev) · [n8n automation](https://github.com/aovozniuk1/portfolio-n8n)
